@@ -38,3 +38,16 @@ Déployeur reste inchangé.
 coffre = 0 ETH — le déployeur retire tout.
 Déployeur grimpe de ≈ +0,06 ETH (0,06 ETH reçus – gas).
 Antoine ne bouge plus (il a déjà payé).
+
+
+
+# frontend , ajouter de l'ether au coffre avec MetaMask
+
+## lancer le frontend
+```
+cd frontend
+```
+
+```
+npm run dev
+```
