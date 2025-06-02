@@ -16,7 +16,6 @@
 ## dans un second terminal pour déployer le contrat
 ```
 npx hardhat run scripts/deploy.ts --network localhost
-
 ```
 
 ##  puis exécuter la transaction , antoine achète le coffre à deployer
@@ -25,7 +24,7 @@ npx hardhat run scripts/transactions.ts --network localhost
 ```
 
 
-## fonctionnement de l'achat du coffre
+## fonctionnement de l'achat du token avec l'eth qui transite par le coffre
 1. ÉTAT INITIAL
 coffre = 0,05 ETH — c’est le dépôt du déployeur au moment du déploiement.
 
