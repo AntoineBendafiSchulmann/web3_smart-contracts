@@ -13,12 +13,12 @@
 ```
 
 
-## dans un second terminal pour déployer le contrat
+## dans un second terminal pour déployer le contrat du token
 ```
 npx hardhat run scripts/deploy.ts --network localhost
 ```
 
-##  puis exécuter la transaction , antoine achète le coffre à deployer
+##  puis exécuter la transaction , antoine achète le token qui a été deployé
 ```
 npx hardhat run scripts/transactions.ts --network localhost
 ```
