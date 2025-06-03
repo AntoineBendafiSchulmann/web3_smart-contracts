@@ -4,7 +4,7 @@ import { CHAINS } from "../constants";
 import VotingArtifact from "../abis/Voting.json";
 
 const votingAddress = import.meta.env.VITE_VOTING_ADDRESS as string;
-const votingAbi     = (VotingArtifact as { abi: any }).abi;
+const votingAbi = (VotingArtifact as { abi: any }).abi;
 
 export type Ballot = {
   id: number;
@@ -18,9 +18,9 @@ export type Ballot = {
 
 export function useVoting(
   provider?: ethers.BrowserProvider,
-  account? : string,
-  chainId? : number
-){
+  account?: string,
+  chainId?: number
+) {
   const [ballots, setBallots] = useState<Ballot[]>([]);
 
   const loadBallots = useCallback(async () => {
@@ -42,29 +42,31 @@ export function useVoting(
         registered = isReg; voted = hasVoted;
       }
 
-      arr.push({ id, title, open, total: Number(total), options,
-                 registered, hasVoted: voted });
+      arr.push({
+        id, title, open, total: Number(total), options,
+        registered, hasVoted: voted
+      });
     }
     setBallots(arr);
   }, [provider, account, chainId]);
 
   /* ────────────── s’enregistrer ───────────── */
-  const register = async (id:number) => {
+  const register = async (id: number) => {
     if (!provider) return;
     if (chainId !== CHAINS.SEPOLIA.id) return;
     const signer = await provider.getSigner();
     await new ethers.Contract(votingAddress, votingAbi, signer)
-            .register(id);
+      .register(id);
     await loadBallots();
   };
 
 
-  const vote = async (id:number,opt:number) => {
+  const vote = async (id: number, opt: number) => {
     if (!provider) return;
     if (chainId !== CHAINS.SEPOLIA.id) return;
     const signer = await provider.getSigner();
     await new ethers.Contract(votingAddress, votingAbi, signer)
-            .vote(id,opt);
+      .vote(id, opt);
     await loadBallots();
   };
 
