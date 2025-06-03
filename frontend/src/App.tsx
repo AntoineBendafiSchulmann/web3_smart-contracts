@@ -1,18 +1,85 @@
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Safe from "./pages/Safe";
-import {useEthereum} from "./hooks/useEthereum";
-import "./App.css";
+import { useState } from "react";
+import LandingPage from "./components/LandingPage";
+import LoginPage from "./components/LoginPage";
+import AwardsPage from "./components/AwardsPage";
+import VotingPage from "./components/VotingPage";
+
+type PageState = "landing" | "login" | "awards" | "voting";
 
 export default function App() {
-    const {account} = useEthereum();
+  const [currentPage, setCurrentPage] = useState<PageState>("landing");
+  const [userAddress, setUserAddress] = useState<string | null>(null);
 
-    return (
-        <Router>
-            <Navbar account={account}/>
-            <Routes>
-                <Route path="/" element={<Safe/>}/>
-            </Routes>
-        </Router>
-    );
+  const handleNavigateToLogin = () => {
+    setCurrentPage("login");
+  };
+
+  const handleNavigateToVoting = () => {
+    if (userAddress) {
+      setCurrentPage("voting");
+    } else {
+      setCurrentPage("login");
+    }
+  };
+
+  const handleLogin = (address: string) => {
+    setUserAddress(address);
+    setCurrentPage("awards");
+  };
+
+  const handleLogout = () => {
+    setUserAddress(null);
+    setCurrentPage("landing");
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentPage("landing");
+  };
+
+  const handleBackToAwards = () => {
+    setCurrentPage("awards");
+  };
+
+  // Render current page
+  switch (currentPage) {
+    case "login":
+      return (
+        <LoginPage 
+          onLogin={handleLogin}
+          onBack={handleBackToLanding}
+        />
+      );
+    
+    case "awards":
+      return userAddress ? (
+        <AwardsPage 
+          userAddress={userAddress}
+          onLogout={handleLogout}
+        />
+      ) : (
+        <LoginPage 
+          onLogin={handleLogin}
+          onBack={handleBackToLanding}
+        />
+      );
+    
+    case "voting":
+      return userAddress ? (
+        <VotingPage 
+          onNavigateToLanding={handleBackToAwards}
+        />
+      ) : (
+        <LoginPage 
+          onLogin={handleLogin}
+          onBack={handleBackToLanding}
+        />
+      );
+    
+    default:
+      return (
+        <LandingPage 
+          onNavigateToVoting={handleNavigateToLogin}
+        />
+      );
+  }
 }
