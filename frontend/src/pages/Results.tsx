@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { useProvider } from "../providers/ProviderContext";
 import { CHAINS } from "../constants";
-import VotingArtifact from "../abis/SimpleVoting.json";
+import VotingArtifact from "../abis/Voting.json";
 
 const votingAddress = import.meta.env.VITE_VOTING_ADDRESS as string;
 const votingAbi     = (VotingArtifact as { abi: any }).abi;
