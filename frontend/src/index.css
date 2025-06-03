@@ -1,44 +1,7 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-  font-family: system-ui, sans-serif;
-  background:#111;
-  color:#eee;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* “carte” principale */
-.card{
-  background:#1e1e1e;
-  padding:2.5rem 3rem;
-  border-radius:1rem;
-  box-shadow:0 0 12px rgba(0,0,0,.6);
-  min-width:320px;
-  text-align:center;
-}
-.card h1{
-  font-size:1.6rem;
-  margin-bottom:1.5rem;
-}
-.card button{
-  background:#8247e5;
-  border:none;
-  color:#fff;
-  font-weight:600;
-  padding:.6rem 1.2rem;
-  border-radius:.5rem;
-  cursor:pointer;
-  margin-top:1.2rem;
-}
-.card p{margin:.4rem 0;}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -146,7 +109,6 @@ body{
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.527 0.154 150.069);
 }
-
 
 @layer base {
   * {

@@ -1,14 +1,14 @@
 /* src/types.d.ts */
 
 interface EthereumProvider {
-    isMetaMask?: boolean;
-    request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
 }
 
 declare global {
-    interface Window {
-        ethereum?: EthereumProvider;
-    }
+  interface Window {
+    ethereum?: EthereumProvider;
+  }
 }
 
 export {};
