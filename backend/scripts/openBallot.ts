@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 
 async function main() {
 
-  const addr = "0x0A926816AFC359dd108B8B9b041DF3a48F1cBC29";
+  const addr = "0x0A926816AFC359dd108B8B9b041DF3a48F1cBC29";// à modifier avec l'adresse du contrat Voting déployé
 
 
   const voting = await ethers.getContractAt("Voting", addr);
