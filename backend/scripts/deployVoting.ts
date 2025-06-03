@@ -4,15 +4,11 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("deployer:", deployer.address);
 
-    const Voting = await ethers.getContractFactory("SimpleVoting");
+    const Voting = await ethers.getContractFactory("Voting");
     const voting = await Voting.deploy();
     await voting.waitForDeployment();
 
-    const addr = await voting.getAddress();
-    console.log("simpleVoting deployed to:", addr);
+    console.log("voting deployed to:", await voting.getAddress());
 }
 
-main().catch((e) => {
-    console.error(e);
-    process.exitCode = 1;
-});
+main().catch((e) => { console.error(e); process.exit(1); });

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useEthereum } from "../hooks/useEthereum";
+import { useSafe } from "../hooks/useSafe";
 import WalletInfo from "../components/WalletInfo";
 import ActionButtons from "../components/ActionButtons";
 
@@ -13,7 +13,7 @@ export default function Safe() {
         deposit,
         withdraw,
         refreshBalances,
-    } = useEthereum();
+    } = useSafe();
 
     useEffect(() => {
         if (!provider || !account) return;
