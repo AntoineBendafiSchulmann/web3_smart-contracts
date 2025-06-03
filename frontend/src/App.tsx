@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import LockArtifact from "./abis/Lock.json";
+import LockArtifact from "../abis/Lock.json";
 
 const lockAddress = import.meta.env.VITE_LOCK_ADDRESS as string;
 const lockAbi = (LockArtifact as { abi: any }).abi;
