@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import VotingArtifact from '../abis/Voting.json';
 import { CHAINS } from '../constants';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
 import {
   BarChart3,
@@ -20,10 +19,8 @@ import {
   Search,
   SlidersHorizontal,
   Users,
-  TrendingUp,
   Filter,
   FileText,
-  Sparkles,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import {
@@ -34,6 +31,14 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Input } from '../components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 
 const MotionCard = motion(Card);
 const MotionButton = motion(Button);
@@ -63,6 +68,10 @@ export default function Results() {
   const [sortOption, setSortOption] = useState('recent');
   const [hoveredBallot, setHoveredBallot] = useState<number | null>(null);
   const [expandedResults, setExpandedResults] = useState<number[]>([]);
+
+  // États pour la modale de confirmation
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [ballotToReset, setBallotToReset] = useState<Ballot | null>(null);
 
   const loadResults = async () => {
     try {
@@ -168,10 +177,16 @@ export default function Results() {
     applyFilters(ballots, activeFilter, searchTerm, sortOption);
   }, [activeFilter, searchTerm, sortOption]);
 
+  const openResetDialog = (ballot: Ballot) => {
+    setBallotToReset(ballot);
+    setIsResetDialogOpen(true);
+  };
+
   const resetVote = async (id: number) => {
     try {
       setResettingId(id);
       setResetStatus('Réinitialisation…');
+      setIsResetDialogOpen(false);
       const prov = new ethers.BrowserProvider((window as any).ethereum);
       const signer = await prov.getSigner();
       await new ethers.Contract(votingAddress, votingAbi, signer).resetIfTie(id);
@@ -613,21 +628,15 @@ export default function Results() {
                           <span className="text-sm font-medium">Égalité détectée</span>
                         </div>
                         <MotionButton
-                          onClick={() => resetVote(ballot.id)}
+                          onClick={() => openResetDialog(ballot)}
                           disabled={resettingId !== null}
                           variant="destructive"
                           size="sm"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          {resettingId === ballot.id ? (
-                            <>
-                              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                              Réinitialisation...
-                            </>
-                          ) : (
-                            'Réinitialiser le vote'
-                          )}
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Réinitialiser le vote
                         </MotionButton>
                       </div>
                     </CardFooter>
@@ -638,26 +647,70 @@ export default function Results() {
           </div>
         )}
       </div>
+
+      {/* Modale de confirmation pour réinitialiser un vote */}
+      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-yellow-500">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmation de réinitialisation
+            </DialogTitle>
+            <DialogDescription>
+              Vous êtes sur le point de réinitialiser le scrutin{' '}
+              <span className="font-medium text-foreground">
+                {ballotToReset?.title || `#${ballotToReset?.id}`}
+              </span>{' '}
+              qui présente une égalité entre{' '}
+              {ballotToReset?.scores && (
+                <span className="font-medium text-yellow-500">
+                  {getBestOptions(ballotToReset.scores).join(', ')}
+                </span>
+              )}
+              .
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-2">
+            <Alert className="bg-yellow-500/10 text-yellow-600 border-yellow-300">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Attention</AlertTitle>
+              <AlertDescription>
+                Cette action va effacer tous les votes de ce scrutin et ne peut pas être annulée.
+                Les électeurs devront voter à nouveau.
+              </AlertDescription>
+            </Alert>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsResetDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => ballotToReset && resetVote(ballotToReset.id)}
+              disabled={resettingId !== null}
+              className="w-full sm:w-auto"
+            >
+              {resettingId === ballotToReset?.id ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Réinitialisation...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Confirmer la réinitialisation
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
-// Icône de graphique à barres personnalisée
-const ChartBarIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect x="3" y="12" width="4" height="8" rx="1" />
-    <rect x="10" y="8" width="4" height="12" rx="1" />
-    <rect x="17" y="4" width="4" height="16" rx="1" />
-  </svg>
-);

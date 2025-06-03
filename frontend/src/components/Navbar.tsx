@@ -15,17 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import {
-  Shield,
-  Vote,
-  BarChart3,
-  Wallet,
-  ExternalLink,
-  Copy,
-  Check,
-  Menu,
-  CircleEllipsis,
-} from 'lucide-react';
+import { Shield, Vote, BarChart3, Wallet, ExternalLink, Copy, Check, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { useProvider } from '../providers/ProviderContext';
 import { cn } from '@/lib/utils';

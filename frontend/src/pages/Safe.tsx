@@ -5,7 +5,7 @@ import WalletInfo from '../components/WalletInfo';
 import ActionButtons from '../components/ActionButtons';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Wallet, ArrowRightLeft, WalletCards } from 'lucide-react';
+import { Wallet, WalletCards } from 'lucide-react';
 
 export default function Safe() {
   const { account, provider } = useProvider();
