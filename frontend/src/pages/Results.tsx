@@ -6,81 +6,86 @@ import { CHAINS } from "../constants";
 const votingAddress = import.meta.env.VITE_VOTING_ADDRESS as string;
 const votingAbi = (VotingArtifact as { abi: any }).abi;
 
-type Score = { label: string; count: number };
+type Score  = { label: string; count: number };
+type Ballot = { id: number; scores: Score[]; tie: boolean };
 
 export default function Results() {
-    const [scores, setScores] = useState<Score[]>([]);
-    const [ballotId, setBallotId] = useState<bigint>(0n);
-    const [isResetNeeded, setIsResetNeeded] = useState(false);
-    const [isResetting, setIsResetting] = useState(false);
-    const [resetStatus, setResetStatus] = useState("");
+  const [ballots,setBallots] = useState<Ballot[]>([]);
+  const [resettingId,setResettingId] = useState<number | null>(null);
+  const [resetStatus,setResetStatus] = useState("");
 
-    const loadResults = async () => {
-    const prov = new ethers.BrowserProvider((window as any).ethereum);
+  const loadResults = async () => {
+    const prov  = new ethers.BrowserProvider((window as any).ethereum);
     const chain = Number(await prov.send("eth_chainId", []));
     if (chain !== CHAINS.SEPOLIA.id) return;
 
     const voting = new ethers.Contract(votingAddress, votingAbi, prov);
-    const nextIdBn = await voting.nextBallotId();
-    if (nextIdBn === 0n) return;
+    const nextId = Number(await voting.nextBallotId());
+    const arr: Ballot[] = [];
 
-    const id = nextIdBn - 1n;
-    setBallotId(id);
-
-    const options: string[] = await voting.getOptions(id);
-    const results = await Promise.all(
-      options.map(async (_, i) => ({
-        label: options[i],
-        count: Number(await voting.tally(id, i))
-      }))
-    );
-    setScores(results);
-
-    const best = Math.max(...results.map(r => r.count));
-    setIsResetNeeded(best > 0 && results.filter(r => r.count === best).length > 1);
+    for (let id = 0; id < nextId; id++) {
+      const options: string[] = await voting.getOptions(id);
+      const scores = await Promise.all(
+        options.map(async (_ , i) => ({
+          label: options[i],
+          count: Number(await voting.tally(id, i))
+        }))
+      );
+      const best = Math.max(...scores.map(s => s.count));
+      const tie  = best > 0 && scores.filter(s => s.count === best).length > 1;
+      arr.push({ id, scores, tie });
+    }
+    setBallots(arr);
   };
 
   useEffect(() => { loadResults(); }, []);
 
-  const resetVote = async () => {
+  const resetVote = async (id: number) => {
     try {
-      setIsResetting(true);
+      setResettingId(id);
       setResetStatus("Réinitialisation…");
-      const prov = new ethers.BrowserProvider((window as any).ethereum);
+      const prov   = new ethers.BrowserProvider((window as any).ethereum);
       const signer = await prov.getSigner();
-      await new ethers.Contract(votingAddress, votingAbi, signer).resetIfTie(ballotId);
+      await new ethers.Contract(votingAddress, votingAbi, signer).resetIfTie(id);
       setResetStatus("Vote réinitialisé ✓");
       await loadResults();
     } catch (e: any) {
       setResetStatus(`Erreur : ${e?.reason ?? e?.message ?? "inconnue"}`);
     } finally {
-      setIsResetting(false);
+      setResettingId(null);
     }
   };
 
   return (
-    <main className="card">
-      <h1>Résultats</h1>
-
-      {scores.length === 0 ? (
-        <p>Aucun vote compté.</p>
+    <>
+      {ballots.length === 0 ? (
+        <main className="card">
+          <h1>Résultats</h1>
+          <p>Aucun scrutin trouvé.</p>
+        </main>
       ) : (
-        <>
-          {scores.map(s => (
-            <p key={s.label}>{s.label} : {s.count}</p>
-          ))}
-
-          {isResetNeeded && (
-            <div style={{ marginTop: "1rem" }}>
-              <p style={{ color: "#eab308" }}>Égalité détectée.</p>
-              <button className="btn" onClick={resetVote} disabled={isResetting}>
-                {isResetting ? "Réinitialisation…" : "Réinitialiser le vote"}
-              </button>
-              {resetStatus && <p>{resetStatus}</p>}
-            </div>
-          )}
-        </>
+        ballots.map(b => (// map c'est comme un foreach pour aller chercher les scrutins et une card par scrutin
+          <main key={b.id} className="card" style={{ marginTop: "1.6rem" }}>
+            <h2>Scrutin&nbsp;#{b.id}</h2>
+            {b.scores.map(s => (
+              <p key={s.label}>{s.label} : {s.count}</p>
+            ))}
+            {b.tie && (
+              <div style={{ marginTop: ".8rem" }}>
+                <p style={{ color: "#eab308" }}>Égalité détectée.</p>
+                <button
+                  className="btn"
+                  onClick={() => resetVote(b.id)}
+                  disabled={resettingId !== null}
+                >
+                  {resettingId === b.id ? "Réinitialisation…" : "Réinitialiser le vote"}
+                </button>
+                {resettingId === b.id && resetStatus && <p>{resetStatus}</p>}
+              </div>
+            )}
+          </main>
+        ))
       )}
-    </main>
+    </>
   );
 }
