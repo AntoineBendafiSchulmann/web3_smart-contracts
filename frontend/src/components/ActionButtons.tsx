@@ -6,10 +6,10 @@ type Props = {
 
 export default function ActionButtons({ deposit, withdraw, refreshBalances }: Props) {
     return (
-        <div className="space-x-3 mt-4">
-            <button onClick={deposit} className="btn">Déposer 0,01 ETH</button>
-            <button onClick={withdraw} className="btn">Retirer</button>
-            <button onClick={refreshBalances} className="btn">Rafraîchir</button>
+        <div>
+            <button className="btn" onClick={deposit}>Déposer 0,01 ETH</button>
+            <button className="btn" onClick={withdraw}>Retirer</button>
+            <button className="btn" onClick={refreshBalances}>Rafraîchir</button>
         </div>
     );
 }

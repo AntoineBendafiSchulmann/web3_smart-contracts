@@ -5,9 +5,9 @@ type Props = {
 
 export default function WalletInfo({ walletBal, lockBal }: Props) {
     return (
-        <>
-            <p><b>Solde wallet :</b> {walletBal} ETH</p>
-            <p><b>Solde coffre :</b> {lockBal} ETH</p>
-        </>
+        <div className="wallet-info">
+            <p><strong>Solde wallet :</strong> {walletBal} ETH</p>
+            <p><strong>Solde coffre :</strong> {lockBal} ETH</p>
+        </div>
     );
 }

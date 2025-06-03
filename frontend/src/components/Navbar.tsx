@@ -1,14 +1,23 @@
+import { Link } from "react-router-dom";
+
 type Props = {
     account?: string;
 };
 
 export default function Navbar({ account }: Props) {
     return (
-        <nav className="w-full bg-gray-900 text-white px-6 py-4 shadow-md flex justify-between items-center">
-            <h1 className="text-xl font-bold">🛡️ Coffre</h1>
+        <header className="navbar">
+            <div className="navbar-left">
+                <h1 className="navbar-logo">🛡️ Coffre</h1>
+                <nav className="navbar-links">
+                    <Link to="/" className="navbar-link">Safe</Link>
+                </nav>
+            </div>
             {account && (
-                <span className="text-sm">{account.slice(0, 6)}…{account.slice(-4)}</span>
+                <div className="navbar-account">
+                    {account.slice(0, 6)}…{account.slice(-4)}
+                </div>
             )}
-        </nav>
+        </header>
     );
 }
